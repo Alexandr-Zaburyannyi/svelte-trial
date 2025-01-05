@@ -1,59 +1,76 @@
 <script>
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcomeFallback from '$lib/images/svelte-welcome.png';
+  import { writable } from 'svelte/store';
+
+  const tasks = writable([
+    { id: Math.random(), value: 'Learn Svelte', status: 'pending' },
+    { id: Math.random(), value: 'Build something awesome', status: 'pending' },
+  ]);
+
+  const handleDoneClick = (/** @type {number} */ id) => {
+    tasks.update((currentTasks) =>
+      currentTasks.map((task) =>
+        task.id === id ? { ...task, status: 'done' } : task,
+      ),
+    );
+  };
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+  <title>Home</title>
+  <meta
+    name="description"
+    content="Svelte demo app"
+  />
 </svelte:head>
 
 <section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcomeFallback} alt="Welcome" />
-			</picture>
-		</span>
+  <h1>Your tasks:</h1>
+  <button>Add task</button>
+  <ul>
+    {#each $tasks as { id, value, status }}
+      <li>
+        <h3>Task: {value}</h3>
 
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
+        <p>Task status: {status}</p>
+        <div>
+          <button
+            class="done-task"
+            on:click={() => handleDoneClick(id)}>Done</button
+          >
+        </div>
+      </li>
+    {/each}
+  </ul>
 </section>
 
-<style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
+<style lang="scss">
+  $primary-color: #ff3e00;
 
-	h1 {
-		width: 100%;
-	}
+  ul {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    list-style: none;
+    gap: 30px;
+    text-align: center;
+  }
+  li {
+    min-width: 300px;
+    max-width: 300px;
+    padding: 10px;
+    border: 3px solid;
+    border-radius: 15px;
+    border-color: $primary-color;
+  }
 
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
-	}
+  .done-task {
+    width: 90px;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    background-color: $primary-color;
+    border-radius: 15px;
+    color: white;
+  }
 </style>
